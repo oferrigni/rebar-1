@@ -614,8 +614,13 @@ reset_after_eunit({OldProcesses, WasAlive, OldAppEnvs, _OldACs}) ->
     if not WasAlive andalso IsAlive ->
             ?DEBUG("Stopping net kernel....\n", []),
             erl_epmd:stop(),
-            _ = net_kernel:stop(),
-            pause_until_net_kernel_stopped();
+            Result = net_kernel:stop(),
+            case Result of 
+                ok ->
+                    ok;
+                _ ->
+                    pause_until_net_kernel_stopped()
+            end;
        true ->
             ok
     end,
